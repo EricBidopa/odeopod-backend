@@ -1,0 +1,11 @@
+{
+  "name": "odeopod-backend",
+  "version": "1.0.0",
+  "description": "audio-streaming-platform-with-blockchain-and-ai-features",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "EricBidopa",
+  "license": "ISC"
+}
