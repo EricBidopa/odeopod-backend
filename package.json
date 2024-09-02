@@ -1,11 +1,15 @@
 {
   "name": "odeopod-backend",
   "version": "1.0.0",
-  "description": "audio-streaming-platform-with-blockchain-and-ai-features",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "EricBidopa",
-  "license": "ISC"
+  "keywords": [],
+  "author": "Eric Bidopa",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
 }
