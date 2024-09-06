@@ -13,9 +13,10 @@ app.use(bodyParser.json());
 
 app.use("/users", usersRouter); // Use the within which / is qual to /users users router
 
+
 // Test to make sure backend is running
 app.get("/", (req, res) => {
-  res.send("OdeoPod backend running!");
+  res.send("OdeoPod backend is running here!");
 });
 
 app.listen(PORT, () => console.log(`server is runnig on port ${PORT}`));
