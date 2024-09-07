@@ -2,12 +2,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/users");
 require("dotenv").config();
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Midleware
 app.use(bodyParser.json());
+// to enable backend to be access from all or specific origins
+app.use(cors());
 
 // Routes
 
@@ -19,4 +22,4 @@ app.get("/", (req, res) => {
   res.send("OdeoPod backend is running here!");
 });
 
-app.listen(PORT, () => console.log(`server is runnig on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`server is runnig on port ${PORT}`));
