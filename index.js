@@ -14,7 +14,7 @@ app.use(cors());
 
 // Routes
 
-app.use("/users", usersRouter); // Use the within which / is qual to /users users router
+app.use("/api/v1/users", usersRouter); // Use the within which / is qual to /users users router
 
 
 // Test to make sure backend is running
