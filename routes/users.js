@@ -60,7 +60,7 @@ router.get("/check-username-availability", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT 1 FROM users WHERE userUsername = $1 LIMIT 1",
-      [userUsername]
+      [userUsername.toLowerCase()]
     );
 
     if (result.rows.length > 0) {
@@ -75,13 +75,31 @@ router.get("/check-username-availability", async (req, res) => {
 
 
 // Route to update user's information in the users table in the database
-router.patch("/:userId", async(req, res)=>{
+// Route to update user's username
+router.patch("/update-username/:userId", async (req, res) => {
     const { userId } = req.params;
-    const updates = req.body;
-
-
-})
-
+    const { userUsername } = req.body;
+  
+    if (!userUsername) {
+      return res.status(400).json({ error: "Username is required" });
+    }
+  
+    try {
+      const result = await pool.query(
+        "UPDATE users SET userUsername = $1 WHERE userId = $2 RETURNING *",
+        [userUsername.toLowerCase(), userId]
+      );
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      res.status(200).json({ message: "Username updated successfully", user: result.rows[0] });
+    } catch (err) {
+      res.status(500).json({ error: `Error updating username: ${err.message}` });
+    }
+  });
+  
 
 
 
