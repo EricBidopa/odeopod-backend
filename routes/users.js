@@ -116,19 +116,21 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+
+
+
 // Route to update user's details in the database when save button is clicked on the settings screen
 
 router.patch("/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { userUsername, userChannelName, userChannelDescription } = req.body;
+  const { userChannelName, userChannelDescription } = req.body;
   try {
     const result = await pool.query(
       `UPDATE users 
-      SET userUsername = $1, userChannelName = $2, userChannelDescription = $3 
-      WHERE userId = $4 
+      SET userChannelName = $1, userChannelDescription = $2
+      WHERE userId = $3 
       RETURNING *`,
       [
-        userUsername.toLowerCase(),
         userChannelName,
         userChannelDescription,
         userId,
