@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 // Midleware
 app.use(bodyParser.json());
-// to enable backend to be access from all or specific origins
+// to enable backend to be access from all or specific origin
 app.use(cors());
 
 // Routes
