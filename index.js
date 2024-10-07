@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3001;
 // Midleware
 app.use(bodyParser.json());
 // to enable backend to be access from all or specific origin
-// will resume work on you very soon, son! Trust me
+// will resume work on you very soon, son! Trust me Well work begins tomorrow bro!
 app.use(cors());
 
 // Routes
