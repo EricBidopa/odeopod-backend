@@ -69,7 +69,7 @@ router.get("/check-username-availability", async (req, res) => {
       res.status(200).json({ message: "Username available" });
     }
   } catch (err) {
-    res.status(500).json({ error: `Error checking username: ${err.message}` });
+    res.status(500).json({ error: `Error checking username availability: ${err.message}` });
   }
 });
 
