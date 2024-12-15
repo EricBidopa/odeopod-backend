@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/users");
-const uploadsRouter = require("./routes/uploads")
+const podcastsRouter = require("./routes/podcasts")
 require("dotenv").config();
 const cors = require('cors');
 
@@ -17,7 +17,7 @@ app.use(cors());
 // Routes
 
 app.use("/api/v1/users", usersRouter); // Use the within which / is qual to /users users router
-app.use("/api/v1/uploads", uploadsRouter); // Use the within which / is qual to /users users router
+app.use("/api/v1/podcasts", podcastsRouter); // Use the within which / is qual to /users users router
 
 
 
