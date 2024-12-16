@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "odeopod",
+  "private_key_id": "a574a7b7ee48d960b205f68b70d4957c9c296a03",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCFQbwUn4yK+o6R\nY5RWD6zfYHiudBmYqqG62qUA67D9AlJWJuJl5LUSGeYcYFStud/fZng4UcbmB3m8\nAI7SOY28bw+fRXsGeLVlmUF0u3b5hSqZlwklfX+NLD0tMsD/EwWJgYDwMbiNJVkB\naXqGegp4hxTAYJv4x4PXyKntppyjNuzyoKLaVS8SaZhlMhT1pnvn7KrdQwe+NsKz\nQlSekCwTdAZ/anTjb/2Wv9VDQOcTytH3UyQux1ALHPuhnpunir/njWr/HZEUMwZj\n8zEZjl7R8Qfe/Xc/KEdAGi7WiVEUIx7S8iBEPWLd4ckKJ9imk/KP5IPLm/GAnc8s\nUBjkBTt/AgMBAAECggEABcQ2c14EIu98w+XfQWokPPZbwpDbmrOnlAJqKYQJgKld\nDsVX/rjK7SGZx5iTkYD9oxk4EpfXV5TzO6N6irZa39CeiHHlRP5sOx1Kq9aA64NL\nuKHEj47CukUz0ITlvSQBlVW5UquUJOd81obN+ovFcDnIOBr2JOndVrUkRVh0Zsul\nsN8GDKWz7APHNLg8vjYFKddaEhUYEtO/iiUM7S0krjTTLSUphD6NxgeiI7Mhrh8D\nLYj3TYIUZzjW5ejdh48Eqa7ox92ao2JQckW1neA1q/2K/UmjhBlkEkErmAFxEQF2\nsPqVrIXV5srKPUJh/48mVZ5AAORTaq/mwX8Af1cSYQKBgQC6cRiipHxI9ozdbQ+8\nqdSTYms95xSyeGrCOZsrzLODcNbuIMMKtvNLMS9YQdcdVjD2xuyU3z3+wRjiXsqa\niHO0+jLr+frtKwranCSCFci4LvMZkLlFA7Yn6pvto0a/pcVmMlPwfnax3YYM7xrm\ngOmPT9VR17g4CSWr401DE4t8jQKBgQC2+PtHu3dbqcpi0qIIRzzXkEqM97NfwDdj\nPPCKeCEYQ+B9pzLoyHa80Kz/aaX2ZoUoaLcA0zPumVb0Lv2UChkwalKw9WTZ+3xQ\n6v9wOcSbyVYf4M4Nm2i4GXFzSHhFYpVahzpKkoxXCa8MnskhoiG7SE+uPShM34UB\nlFECA8ljOwKBgAjWB1bd+M30cWSlIJPOcLazeWWrp/11W4ns9P+0aeWW2XjbsKK3\nXPx5Tkceh7VqOlPXxaqgke2a9TT1TSDZyrIPEY7BgDTxT0hhEhHgOm0QPJE/nKg6\nrs1hfxZaIKZAkwRu6i+BrtprJ0lBo8K85VTXccK5OI/fTxvAYA8HxBqZAoGAM7hL\nZyphgcKL18VMUeS5GQHLYO9/f5hYz69hGvL7/9zn7vy9Ejnf/l1KGWRmqjCugQ6g\ndBY/PrmPb7R8r0Tve9UCDM1AtbE1obXbgICDx7lwo9AqzoPYZPmkLP8WKB7GsvE4\nk+26x7uQBJQ5rE0lFchJ5amZ46jm8txWzaf+XBMCgYEAluGy7BsROLft3q7AyWrq\ni4bGjl7JpFJjjNV2KGc2fioLp2wuNs4/Tb2nRNI2KcZF4r87W1L6wzhDZzFMm2e/\nhampbIQrTYaBI5DaRqJMFkSJBrNl9WWLArMHFJ4w0ia02uKPKVHVFftOGjhPwYhf\nsMwZhZcVJzyD8KRHcHrSqNc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "odeopod-dev@odeopod.iam.gserviceaccount.com",
+  "client_id": "102586604005699224831",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/odeopod-dev%40odeopod.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

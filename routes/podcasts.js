@@ -2,6 +2,12 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 const { Pool } = require("pg");
+const multer = require('multer');
+const { bucket } = require('../gcsConfig');
+const { v4: uuidv4 } = require('uuid'); // For generating unique file names
+
+
+
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -11,6 +17,86 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
+
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Files are stored in memory before being uploaded to GCS
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB file size limit
+});
+
+// Endpoint for uploading audio files
+router.post('/upload/audio', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const fileName = `audio/${uuidv4()}-${req.file.originalname}`;
+    const file = bucket.file(fileName);
+
+    // Create a stream to upload the file
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+    });
+
+    stream.on('error', (err) => {
+      console.error(err);
+      return res.status(500).send('Failed to upload file.');
+    });
+
+    stream.on('finish', async () => {
+      // Make the file public (optional)
+      await file.makePublic();
+
+      // Generate a public URL for the uploaded file
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+      res.status(200).json({ url: publicUrl });
+    });
+
+    stream.end(req.file.buffer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error.');
+  }
+});
+
+// Endpoint for uploading cover images
+router.post('/upload/cover', upload.single('coverImage'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const fileName = `images/${uuidv4()}-${req.file.originalname}`;
+    const file = bucket.file(fileName);
+
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+    });
+
+    stream.on('error', (err) => {
+      console.error(err);
+      return res.status(500).send('Failed to upload file.');
+    });
+
+    stream.on('finish', async () => {
+      await file.makePublic();
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      res.status(200).json({ url: publicUrl });
+    });
+
+    stream.end(req.file.buffer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error.');
+  }
+});
+
 
 // Route to Add New Podcast
 router.post("/", async (req, res) => {
