@@ -26,4 +26,4 @@ app.get("/", (req, res) => {
   res.send("OdeoPod backend is running here!");
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`server is runnig on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`server is running on port ${PORT}`));

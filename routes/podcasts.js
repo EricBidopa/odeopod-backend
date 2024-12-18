@@ -2,12 +2,9 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 const { Pool } = require("pg");
-const multer = require('multer');
-const { bucket } = require('../gcsConfig');
-const { v4: uuidv4 } = require('uuid'); // For generating unique file names
-
-
-
+const multer = require("multer");
+const { bucket } = require("../gcsConfig");
+const { v4: uuidv4 } = require("uuid");
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -18,85 +15,62 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-
+// Setup multer for file uploads
 const upload = multer({
-  storage: multer.memoryStorage(), // Files are stored in memory before being uploaded to GCS
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB file size limit
+  storage: multer.memoryStorage(),
 });
 
+// Helper function to upload files to GCS
+const uploadFileToGCS = (file, folderName) => {
+  return new Promise((resolve, reject) => {
+    const fileName = `${folderName}/${uuidv4()}-${file.originalname}`;
+    const fileRef = bucket.file(fileName);
+
+    const stream = fileRef.createWriteStream({
+      metadata: { contentType: file.mimetype },
+    });
+
+    stream.on("error", (err) => {
+      console.error("File Upload Error:", err.message);
+      reject(err);
+    });
+
+    stream.on("finish", async () => {
+      await fileRef.makePublic();
+      resolve(`https://storage.googleapis.com/${bucket.name}/${fileName}`);
+    });
+
+    stream.end(file.buffer);
+  });
+};
+
 // Endpoint for uploading audio files
-router.post('/upload/audio', upload.single('audio'), async (req, res) => {
+router.post("/upload/audio", upload.single("audio"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
   try {
-    if (!req.file) {
-      return res.status(400).send('No file uploaded.');
-    }
-
-    const fileName = `audio/${uuidv4()}-${req.file.originalname}`;
-    const file = bucket.file(fileName);
-
-    // Create a stream to upload the file
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: req.file.mimetype,
-      },
-    });
-
-    stream.on('error', (err) => {
-      console.error(err);
-      return res.status(500).send('Failed to upload file.');
-    });
-
-    stream.on('finish', async () => {
-      // Make the file public (optional)
-      await file.makePublic();
-
-      // Generate a public URL for the uploaded file
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-
-      res.status(200).json({ url: publicUrl });
-    });
-
-    stream.end(req.file.buffer);
+    const publicUrl = await uploadFileToGCS(req.file, "audio");
+    res.status(200).json({ url: publicUrl });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error.');
+    console.error("Audio Upload Error:", error.message);
+    res.status(500).json({ error: "Failed to upload audio file." });
   }
 });
 
 // Endpoint for uploading cover images
-router.post('/upload/cover', upload.single('coverImage'), async (req, res) => {
+router.post("/upload/cover", upload.single("coverImage"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
   try {
-    if (!req.file) {
-      return res.status(400).send('No file uploaded.');
-    }
-
-    const fileName = `images/${uuidv4()}-${req.file.originalname}`;
-    const file = bucket.file(fileName);
-
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: req.file.mimetype,
-      },
-    });
-
-    stream.on('error', (err) => {
-      console.error(err);
-      return res.status(500).send('Failed to upload file.');
-    });
-
-    stream.on('finish', async () => {
-      await file.makePublic();
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-      res.status(200).json({ url: publicUrl });
-    });
-
-    stream.end(req.file.buffer);
+    const publicUrl = await uploadFileToGCS(req.file, "images");
+    res.status(200).json({ url: publicUrl });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error.');
+    console.error("Image Upload Error:", error.message);
+    res.status(500).json({ error: "Failed to upload cover image." });
   }
 });
-
 
 // Route to Add New Podcast
 router.post("/", async (req, res) => {
@@ -104,9 +78,9 @@ router.post("/", async (req, res) => {
     podcastTitle,
     podcastDescription,
     podcastDownloadUrl,
-    podcastUploadedBy,
     podcastCoverImgUrl,
     podcastCreatedAt,
+    userId,
   } = req.body;
 
   // Input validation
@@ -114,7 +88,6 @@ router.post("/", async (req, res) => {
     !podcastTitle ||
     !podcastDescription ||
     !podcastDownloadUrl ||
-    !podcastUploadedBy ||
     !podcastCoverImgUrl ||
     !podcastCreatedAt
   ) {
@@ -122,34 +95,36 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      `INSERT INTO podcasts (
+    const query = `
+      INSERT INTO podcasts (
         podcastTitle, 
         podcastDescription, 
         podcastDownloadUrl, 
-        podcastUploadedBy, 
         podcastCoverImgUrl, 
-        podcastCreatedAt
-      ) VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *`,
-      [
-        podcastTitle,
-        podcastDescription,
-        podcastDownloadUrl,
-        podcastUploadedBy,
-        podcastCoverImgUrl,
         podcastCreatedAt,
-      ]
-    );
+        userId
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *`;
+    const values = [
+      podcastTitle,
+      podcastDescription,
+      podcastDownloadUrl,
+      podcastCoverImgUrl,
+      podcastCreatedAt,
+      userId,
+    ];
 
-    // Send success response
+    const result = await pool.query(query, values);
+
     res.status(201).json({
       message: "Podcast added successfully!",
       podcast: result.rows[0],
     });
   } catch (err) {
-    console.error("Database Error:", err.message);
-    res.status(500).json({ error: `Error inserting podcast: ${err.message}` });
+    console.error("Database Insert Error:", err.message);
+    res
+      .status(500)
+      .json({ error: "Failed to add podcast. Please try again later." });
   }
 });
 
