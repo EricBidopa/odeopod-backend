@@ -21,6 +21,7 @@ const upload = multer({
 });
 
 // Helper function to upload files to GCS
+
 const uploadFileToGCS = (file, folderName) => {
   return new Promise((resolve, reject) => {
     const fileName = `${folderName}/${uuidv4()}-${file.originalname}`;
@@ -46,15 +47,12 @@ const uploadFileToGCS = (file, folderName) => {
 
 // Endpoint for uploading audio files
 router.post("/upload/audio", upload.single("audio"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded." });
-  }
   try {
-    const publicUrl = await uploadFileToGCS(req.file, "audio");
-    res.status(200).json({ url: publicUrl });
-  } catch (error) {
-    console.error("Audio Upload Error:", error.message);
-    res.status(500).json({ error: "Failed to upload audio file." });
+    const audioUrl = await uploadFileToGCS(req.file, "audio");
+    res.status(200).json({ url: audioUrl });
+  } catch (err) {
+    console.error("Audio upload failed:", err);
+    res.status(500).json({ error: "Audio upload failed" });
   }
 });
 
