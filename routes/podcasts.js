@@ -59,7 +59,7 @@ router.post("/upload/audio", upload.single("audio"), async (req, res) => {
 });
 
 // Endpoint for uploading cover images
-router.post("/upload/cover", upload.single("coverImage"), async (req, res) => {
+router.post("/upload/image", upload.single("coverImage"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded." });
   }
@@ -78,8 +78,8 @@ router.post("/", async (req, res) => {
     podcastTitle,
     podcastDescription,
     podcastDownloadUrl,
-    podcastCoverImgUrl,
     podcastCreatedAt,
+    podcastCoverImgUrl,
     userId,
   } = req.body;
 
@@ -100,8 +100,8 @@ router.post("/", async (req, res) => {
         podcastTitle, 
         podcastDescription, 
         podcastDownloadUrl, 
-        podcastCoverImgUrl, 
         podcastCreatedAt,
+        podcastCoverImgUrl, 
         userId
       ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`;
@@ -109,8 +109,8 @@ router.post("/", async (req, res) => {
       podcastTitle,
       podcastDescription,
       podcastDownloadUrl,
-      podcastCoverImgUrl,
       podcastCreatedAt,
+      podcastCoverImgUrl,
       userId,
     ];
 
