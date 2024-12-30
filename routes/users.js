@@ -94,7 +94,7 @@ router.patch("/update-username/:userId", async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Username updated successfully", user: result.rows[0] });
+      .json({ message: "Username has been updated successfully", user: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: `Error updating username: ${err.message}` });
   }
