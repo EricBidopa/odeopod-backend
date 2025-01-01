@@ -24,7 +24,9 @@ const upload = multer({
 const uploadFileToGCS = (file, folderName) => {
   return new Promise((resolve, reject) => {
     try {
-      const fileName = `${folderName}/${require('uuid').v4()}-${file.originalname}`;
+      const fileName = `${folderName}/${require("uuid").v4()}-${
+        file.originalname
+      }`;
       const fileRef = bucket.file(fileName);
 
       const stream = fileRef.createWriteStream({
@@ -37,23 +39,23 @@ const uploadFileToGCS = (file, folderName) => {
       });
 
       // Handle stream errors
-      stream.on('error', (error) => {
-        console.error('Stream Error:', error);
+      stream.on("error", (error) => {
+        console.error("Stream Error:", error);
         reject(error);
       });
 
       // Handle upload completion
-      stream.on('finish', async () => {
+      stream.on("finish", async () => {
         try {
           // Make the file public
           await fileRef.makePublic();
-          
+
           // Get the public URL
           const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-          console.log('File uploaded successfully:', fileName);
+          console.log("File uploaded successfully:", fileName);
           resolve(publicUrl);
         } catch (error) {
-          console.error('Make Public Error:', error);
+          console.error("Make Public Error:", error);
           reject(error);
         }
       });
@@ -61,7 +63,7 @@ const uploadFileToGCS = (file, folderName) => {
       // Write the file buffer to the stream
       stream.end(file.buffer);
     } catch (error) {
-      console.error('Upload Setup Error:', error);
+      console.error("Upload Setup Error:", error);
       reject(error);
     }
   });
@@ -75,23 +77,22 @@ router.post("/upload/audio", upload.single("audio"), async (req, res) => {
       return res.status(400).json({ error: "No audio file provided" });
     }
 
-    console.log('Starting audio upload:', {
+    console.log("Starting audio upload:", {
       originalname: req.file.originalname,
       size: req.file.size,
-      mimetype: req.file.mimetype
+      mimetype: req.file.mimetype,
     });
 
-    const audioUrl = await uploadFileToGCS(req.file, 'audio');
+    const audioUrl = await uploadFileToGCS(req.file, "audio");
     res.status(200).json({ url: audioUrl });
   } catch (err) {
     console.error("Audio upload error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Audio upload failed",
-      details: err.message 
+      details: err.message,
     });
   }
 });
-
 
 // route to upload image
 router.post("/upload/image", upload.single("coverImage"), async (req, res) => {
@@ -100,19 +101,19 @@ router.post("/upload/image", upload.single("coverImage"), async (req, res) => {
       return res.status(400).json({ error: "No image file provided" });
     }
 
-    console.log('Starting image upload:', {
+    console.log("Starting image upload:", {
       originalname: req.file.originalname,
       size: req.file.size,
-      mimetype: req.file.mimetype
+      mimetype: req.file.mimetype,
     });
 
-    const imageUrl = await uploadFileToGCS(req.file, 'images');
+    const imageUrl = await uploadFileToGCS(req.file, "images");
     res.status(200).json({ url: imageUrl });
   } catch (err) {
     console.error("Image upload error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Image upload failed",
-      details: err.message 
+      details: err.message,
     });
   }
 });
@@ -207,17 +208,85 @@ router.post("/", async (req, res) => {
   }
 });
 
- // Route to get all podcasts and show on the home page
- router.get("/", async (req, res) => {
+// Route to get all global podcasts and show on the home page
+router.get("/", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM podcasts",
-    );
+    const query = `
+      SELECT 
+        *
+      FROM 
+        podcasts p
+      JOIN 
+        users u
+      ON 
+        p.userid = u.userid;
+    `;
+    const result = await pool.query(query);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching podcasts with user data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route to get all podcasts uploaded by a specific user
+router.get("/:userid", async (req, res) => {
+  const { userid } = req.params;
+
+  try {
+    const query = `
+      SELECT *
+      FROM 
+        podcasts p
+      JOIN 
+        users u
+      ON 
+        p.userid = u.userid
+      WHERE 
+        p.userid = $1
+    `;
+
+    const result = await pool.query(query, [userid]);
+
+    // Check if there are any results
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No podcasts found for this user." });
+    }
+
     res.status(200).json(result.rows);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: `Error fetching podcasts for home page: ${error.message}` });
+    console.error("Error fetching user podcasts:", error.message);
+    res.status(500).json({ error: `Error fetching user info: ${error.message}` });
+  }
+});
+
+
+// Route to search for podcasts
+router.get("/search", async (req, res) => {
+  const { query } = req.query; // Get the search query from the request
+
+  if (!query) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  try {
+    // Use ILIKE for case-insensitive search
+    const searchQuery = `
+      SELECT * FROM podcasts
+      WHERE podcast_title ILIKE $1 OR podcast_description ILIKE $1
+    `;
+    const values = [`%${query}%`]; // Wildcard search
+
+    const result = await pool.query(searchQuery, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No podcasts found" });
+    }
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Failed to search podcasts" });
   }
 });
 
