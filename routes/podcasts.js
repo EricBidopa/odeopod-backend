@@ -208,7 +208,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Route to get all global podcasts and show on the home page
+// Route to get all global podcasts with users that uploaded and show on the home page
 router.get("/", async (req, res) => {
   try {
     const query = `
@@ -226,6 +226,44 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error("Error fetching podcasts with user data:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/search", async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  try {
+    // Log the actual query value for debugging
+    console.log("Search query:", query);
+
+    const searchQuery = `
+    SELECT 
+      *
+    FROM 
+      podcasts p
+    JOIN 
+      users u
+    ON 
+      p.userid = u.userid
+    WHERE 
+      p.podcast_title ILIKE $1 
+      OR p.podcast_description ILIKE $1 
+      OR u.userusername ILIKE $1 
+      OR u.userchannelname ILIKE $1
+    `;
+    const values = [`%${query}%`];
+
+    const result = await pool.query(searchQuery, values);
+    // console.log("Query results:", result.rows);
+    return res.status(200).json(result.rows);
+
+  } catch (error) {
+    console.error("Search error:", error);
+    return res.status(500).json({ error: "Failed to search podcasts" });
   }
 });
 
@@ -248,45 +286,14 @@ router.get("/:userid", async (req, res) => {
 
     const result = await pool.query(query, [userid]);
 
-    // Check if there are any results
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No podcasts found for this user." });
-    }
+       // Return empty array instead of 404
+       return res.status(200).json(result.rows);
 
-    res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching user podcasts:", error.message);
-    res.status(500).json({ error: `Error fetching user info: ${error.message}` });
-  }
-});
-
-
-// Route to search for podcasts
-router.get("/search", async (req, res) => {
-  const { query } = req.query; // Get the search query from the request
-
-  if (!query) {
-    return res.status(400).json({ error: "Search query is required" });
-  }
-
-  try {
-    // Use ILIKE for case-insensitive search
-    const searchQuery = `
-      SELECT * FROM podcasts
-      WHERE podcast_title ILIKE $1 OR podcast_description ILIKE $1
-    `;
-    const values = [`%${query}%`]; // Wildcard search
-
-    const result = await pool.query(searchQuery, values);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No podcasts found" });
-    }
-
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("Search error:", error);
-    res.status(500).json({ error: "Failed to search podcasts" });
+    res
+      .status(500)
+      .json({ error: `Error fetching user info: ${error.message}` });
   }
 });
 

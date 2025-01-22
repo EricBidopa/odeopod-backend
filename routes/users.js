@@ -69,14 +69,16 @@ router.get("/check-username-availability", async (req, res) => {
       res.status(200).json({ message: "Username available" });
     }
   } catch (err) {
-    res.status(500).json({ error: `Error checking username availability: ${err.message}` });
+    res
+      .status(500)
+      .json({ error: `Error checking username availability: ${err.message}` });
   }
 });
 
 // Route to update user's username in the users table in the database
 router.patch("/update-username/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { userUsername } = req.body;
+  const { userUsername, userChannelName } = req.body;
 
   if (!userUsername) {
     return res.status(400).json({ error: "Username is required" });
@@ -84,8 +86,11 @@ router.patch("/update-username/:userId", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "UPDATE users SET userUsername = $1 WHERE userId = $2 RETURNING *",
-      [userUsername.toLowerCase(), userId]
+      `UPDATE users 
+      SET userUsername = $1, userChannelName = $2
+      WHERE userId = $3 
+      RETURNING *`,
+      [userUsername.toLowerCase(), userChannelName, userId]
     );
 
     if (result.rows.length === 0) {
@@ -94,7 +99,10 @@ router.patch("/update-username/:userId", async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Username has been updated successfully", user: result.rows[0] });
+      .json({
+        message: "Username and Channel name has been updated successfully",
+        user: result.rows[0],
+      });
   } catch (err) {
     res.status(500).json({ error: `Error updating username: ${err.message}` });
   }
@@ -116,9 +124,6 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-
-
-
 // Route to update user's details in the database when save button is clicked on the settings screen
 
 router.patch("/:userId", async (req, res) => {
@@ -130,11 +135,7 @@ router.patch("/:userId", async (req, res) => {
       SET userChannelName = $1, userChannelDescription = $2
       WHERE userId = $3 
       RETURNING *`,
-      [
-        userChannelName,
-        userChannelDescription,
-        userId,
-      ]
+      [userChannelName, userChannelDescription, userId]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
