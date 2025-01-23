@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/users");
 const podcastsRouter = require("./routes/podcasts")
+const subscriptionsRouter = require("./routes/subscriptions")
 require("dotenv").config();
 const cors = require('cors');
 
@@ -22,6 +23,8 @@ app.use(cors({
 
 app.use("/api/v1/users", usersRouter); // Use the within which / is qual to /users users router
 app.use("/api/v1/podcasts", podcastsRouter); // Use the within which / is qual to /users users router
+app.use("/api/v1/subscriptions", subscriptionsRouter); // Use the within which / is qual to /users users router
+
 
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
