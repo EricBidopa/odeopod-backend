@@ -73,6 +73,9 @@ router.get("/status", async (req, res) => {
       res.status(500).json({ error: `Error checking subscription status: ${err.message}` });
     }
   });
+
+
+  
   
   
 module.exports = router;
