@@ -298,25 +298,25 @@ router.get("/:userid", async (req, res) => {
 });
 
 // Get all channels a user has subscribed to
-router.get("/subscribedto/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
+// router.get("/subscribedto/:userId", async (req, res) => {
+//   try {
+//     const { userId } = req.params;
 
-    // Fetch all subscriptions for the user
-    const subscriptionsQuery = `
-      SELECT u.userId, u.userChannelName, u.userChannelDescription, u.userProfileImgUrl
-      FROM subscriptions s
-      JOIN users u ON s.subscribedto_id = u.userId
-      WHERE s.subscriber_id = $1
-    `;
+//     // Fetch all subscriptions for the user
+//     const subscriptionsQuery = `
+//       SELECT u.userId, u.userChannelName, u.userChannelDescription, u.userProfileImgUrl
+//       FROM subscriptions s
+//       JOIN users u ON s.subscribedto_id = u.userId
+//       WHERE s.subscriber_id = $1
+//     `;
 
-    const result = await pool.query(subscriptionsQuery, [userId]);
+//     const result = await pool.query(subscriptionsQuery, [userId]);
 
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Error fetching subscriptions:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+//     res.json(result.rows);
+//   } catch (error) {
+//     console.error("Error fetching subscriptions:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
 module.exports = router;
