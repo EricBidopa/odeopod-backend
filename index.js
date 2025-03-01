@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("./db/db");  // Import the database connection
+const db = require("./db/db"); // Import the database connection
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/users");
 const podcastsRouter = require("./routes/podcasts");
@@ -12,11 +12,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors({
-  origin: '*', // Be more specific in production
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "*", // Be more specific in production
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ limit: "500mb", extended: true }));
@@ -34,10 +36,12 @@ app.get("/", (req, res) => {
 // Ensure DB connection before starting server
 db.connect()
   .then(() => {
-    console.log("Connected to Supabase PostgreSQL ✅");
-    app.listen(PORT, "0.0.0.0", () => console.log(`Server is running on port ${PORT}`));
+    console.log("Connected to Supabase PostgreSQL");
+    app.listen(PORT, "0.0.0.0", () =>
+      console.log(`Server is running on port ${PORT}`)
+    );
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Database connection error ❌", err);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1);
   });
